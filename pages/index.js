@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getCadastro, getFinancas } from '../services/api';
-import html2pdf from 'html2pdf.js';
 import styles from '../styles/Modal.module.css';
 
 export default function Home() {
@@ -18,9 +17,14 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const downloadPDF = () => {
-    const element = document.getElementById('modal-content');
-    html2pdf().from(element).save('consulta.pdf');
+  const downloadPDF = async () => {
+    if (typeof window !== 'undefined') {
+      const html2pdf = (await import('html2pdf.js')).default;
+      const element = document.getElementById('modal-content');
+      if (element) {
+        html2pdf().from(element).save('consulta.pdf');
+      }
+    }
   };
 
   return (
@@ -32,7 +36,7 @@ export default function Home() {
           <button onClick={downloadPDF}>Download PDF</button>
           <div className={styles.cadastroSection}>
             <h2>Dados Individuais</h2>
-            {cadastro.map(item => (
+            {cadastro.map((item) => (
               <div key={item.id}>
                 <p>Nome: {item.name}</p>
                 <p>Role: {item.role}</p>
@@ -42,7 +46,7 @@ export default function Home() {
           </div>
           <div className={styles.financasSection}>
             <h2>Dados de Envolvidos</h2>
-            {financas.map(item => (
+            {financas.map((item) => (
               <div key={item.id}>
                 <p>Nome: {item.name}</p>
                 <p>Exposição Potencial: {item.potentialExposure}</p>
