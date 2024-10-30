@@ -19,19 +19,41 @@ export default function Home() {
 
   const downloadPDF = async () => {
     if (typeof window !== 'undefined') {
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
       const element = document.getElementById('modal-content');
-      if (element) {
-        html2pdf().from(element).save('consulta.pdf');
+      if (element && element.innerHTML.trim() !== "") {
+        element.style.color = "black";
+        
+        setTimeout(() => {
+          html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            width: element.scrollWidth,
+            height: element.scrollHeight
+          }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('consulta.pdf');
+          });
+        }, 1000);
+      } else {
+        console.log("Element is empty or not found");
       }
     }
   };
 
   return (
     <div>
-      <button onClick={() => setShowModal(true)}>Visualizar consulta</button>
+      <div className={showModal ? 'hide-button' : 'center-button'}>
+        <button className="visualizar-button" onClick={() => setShowModal(true)}>Visualizar consulta</button>
+      </div>
       {showModal && (
-        <div id="modal-content" className={styles.modal}>
+        <div id="modal-content" className={`${styles.modal} modal-content`}>
           <button onClick={() => setShowModal(false)}>Fechar</button>
           <button onClick={downloadPDF}>Download PDF</button>
           <div className={styles.cadastroSection}>
@@ -40,7 +62,6 @@ export default function Home() {
               <div key={item.id}>
                 <p>Nome: {item.name}</p>
                 <p>Role: {item.role}</p>
-                {/* Adicionar outros campos */}
               </div>
             ))}
           </div>
@@ -50,7 +71,6 @@ export default function Home() {
               <div key={item.id}>
                 <p>Nome: {item.name}</p>
                 <p>Exposição Potencial: {item.potentialExposure}</p>
-                {/* Adicionar outros campos */}
               </div>
             ))}
           </div>
@@ -58,6 +78,4 @@ export default function Home() {
       )}
     </div>
   );
-  // Forçando novo deploy .
-  // Forçando novo deploy v2.
 }
