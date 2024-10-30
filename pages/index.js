@@ -58,5 +58,5 @@ export default function Home() {
       )}
     </div>
   );
-  // Forçando novo deploy.
+  // Forçando novo deploy v2.
 }
