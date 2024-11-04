@@ -9,7 +9,7 @@ export default function Dados() {
     const router = useRouter();
     const [cadastro, setCadastro] = useState([]);
     const [financas, setFinancas] = useState([]);
-    const [showModal, setShowModal] = useState(true);
+    const [showModal] = useState(true);
     const roundToTwo = (num) => Math.round(num * 100) / 100
     useEffect(() => {
         async function fetchData() {
